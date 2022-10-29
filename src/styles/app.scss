@@ -1,0 +1,9 @@
+@import './fonts';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:global(body) {
+	font-family: 'Open Sans', sans-serif;
+}
