@@ -36,7 +36,16 @@
 	}
 
 	function setDefaultTermLines() {
-		termLines = [];
+		termLines = [
+			aTerminalLine()
+				.withContent('👋 Hello, world! Welcome to my personal website')
+				.withHtmlSafe(true)
+				.build(),
+			aTerminalLine()
+				.withContent("💡 For a list of available commands, type <cmd>'help'</cmd>")
+				.withHtmlSafe(true)
+				.build()
+		];
 	}
 
 	function moveCaretLeft() {
@@ -89,19 +98,20 @@
 
 <svelte:window on:keydown={focusCommandInput} />
 
-<div class="fixed top-2 right-2">
-	<a href="https://www.linkedin.com/in/ian-cowan/" class="drop-shadow-lg shadow-white">
-		<Fa icon={faLinkedin} size="1.5x" class="inline hover:shadow-none" />
-	</a>
-	<a href="https://github.com/iccowan">
-		<Fa icon={faGithub} size="1.5x" class="inline drop-shadow-lg shadow-white hover:shadow-none" />
-	</a>
-</div>
-
 {#if termLines}
 	<div id="terminal-container" class="m-4">
 		<div class="terminal-header">
 			<span class="text-accent-focus">
+				<p>FooBart 🤖 v1.0.0</p>
+				<p>Kernel 🌽 Version 6.1-rc2</p>
+				<div>
+					<a href="https://www.linkedin.com/in/ian-cowan">
+						<Fa icon={faLinkedin} size="1.5x" class="inline icon-shadow" />
+					</a>
+					<a href="https://github.com/iccowan">
+						<Fa icon={faGithub} size="1.5x" class="inline icon-shadow" />
+					</a>
+				</div>
 				<pre class="mb-0">
             __/\__ 
            `==/\==`              _____               _____ 
@@ -150,5 +160,17 @@
 
 	span#caret {
 		left: calc(var(--caret-offset) * 0.6rem);
+	}
+
+	:global(cmd) {
+		text-shadow: 0 0 5px hsl(var(--s));
+	}
+
+	:global(.icon-shadow path) {
+		filter: drop-shadow(0 0 100px hsl(var(--s)));
+	}
+
+	:global(.icon-shadow:hover path) {
+		filter: none;
 	}
 </style>
