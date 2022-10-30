@@ -1,10 +1,9 @@
-@import './fonts';
-@import '../../node_modules/xterm/css/xterm.css';
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+@import './fonts';
+
 :global(body) {
-	font-family: 'Open Sans', sans-serif;
+	font-family: 'Fira Code', sans-serif;
 }

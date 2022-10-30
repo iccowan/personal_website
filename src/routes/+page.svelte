@@ -1,125 +1,149 @@
 <script type="ts">
 	import { onMount } from 'svelte';
-	import type { Terminal } from 'xterm';
+	import type { TerminalLine } from '../models/TerminalLine';
+	import { aTerminalLine } from '../models/TerminalLine';
+	import Fa from 'svelte-fa';
+	import { faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons';
 
-	let term: Terminal;
-	const writeDelay = 0;
-	let currLine: string = '';
-	let acceptInput: boolean = false;
+	let termLines: TerminalLine[];
+	let displayInputLine = false;
+	let userName = 'guest';
+	let lineLeader: string;
 
-	const timer = (msToWait) => new Promise((res) => setTimeout(res, msToWait));
+	let commandInput: HTMLInputElement;
+	let currentCommandContent = '';
+	let caretOffset = 0;
+	let currentCharUnderCaret: string;
+	$: {
+		const currentCharIdx = currentCommandContent.length + caretOffset;
+		currentCharUnderCaret =
+			caretOffset === 0 ? ' ' : currentCommandContent.substring(currentCharIdx, currentCharIdx + 1);
+	}
 
 	onMount(() => {
-		import('xterm').then((xterm) => {
-			term = new xterm.Terminal({
-				cursorStyle: 'block',
-				cursorBlink: true,
-				disableStdin: false,
-				fontSize: 18,
-				cols: calculateTerminalWidth()
-			});
-			term.open(document.getElementById('terminal')!);
-
-			initTerm();
-		});
+		setDefaultTermLines();
+		updateLineLeader('guest');
+		displayInputLine = true;
 	});
 
-	function calculateTerminalWidth() {
-		return Math.floor(
-			document.getElementById('term-container')!.getBoundingClientRect()['width'] / 12
-		);
+	function updateLineLeader(name: string) {
+		userName = name;
+		lineLeader = `[${userName}@ian.cowan.aero ~]$ `;
 	}
 
-	async function initTerm() {
-		await writeToTerm('Hello, World! 👋');
-		await writeToTerm("My name is FooBart and it's my job to introduce you to Ian Cowan!");
-		writeNewlineToTerm();
-		await writeToTerm('I hope you like the command line!');
-		await writeToTerm(
-			"This is one of Ian's favorite tools and it appears this is all that is working here at the moment..."
-		);
-		await writeToTerm("No worries if you don't know how to use it... I'm here to help!");
-		writeNewlineToTerm();
-		await writeToTerm(
-			"If at any time you're lost and want to see a list of commands you can use, simply type `help`."
-		);
-		await writeToTerm("Let's get started! - try typing the command `help` to see what you can do!");
+	function setDefaultTermLines() {
+		termLines = [];
+	}
 
-		term.onKey(({ key, domEvent }) => {
-			if (acceptInput) {
-				switch (domEvent.key) {
-					case 'Enter':
-						writeNewlineToTerm();
-						handleInput(currLine);
-						currLine = '';
-						break;
-					case 'Backspace':
-						currLine = currLine.slice(0, currLine.length - 1);
-						term.write('\b \b');
-						break;
-					default:
-						currLine += key;
-						term.write(key);
-						break;
-				}
+	function moveCaretLeft() {
+		caretOffset = Math.max(-1 * currentCommandContent.length, caretOffset - 1);
+	}
 
-				console.log(currLine);
-			}
+	function moveCaretRight() {
+		caretOffset = Math.min(0, caretOffset + 1);
+	}
+
+	function submitCurrentCommand() {
+		displayInputLine = false;
+		termLines = [
+			...termLines,
+			aTerminalLine()
+				.withContent(lineLeader + currentCommandContent)
+				.build()
+		];
+		handleCalledCommand(currentCommandContent).then(() => {
+			displayInputLine = true;
 		});
-
-		acceptTermInput();
+		currentCommandContent = '';
 	}
 
-	async function writeToTerm(toWrite: string) {
-		for (const ltr of toWrite) {
-			term.write(ltr);
-			await timer(writeDelay);
+	function handleCalledCommand(currentCommandContent: string): Promise<void> {
+		return new Promise((resolve) => {
+			resolve();
+		});
+	}
+
+	function focusCommandInput(event: KeyboardEvent) {
+		if (commandInput) {
+			switch (event.code) {
+				case 'ArrowLeft':
+					moveCaretLeft();
+					break;
+				case 'ArrowRight':
+					moveCaretRight();
+					break;
+				case 'Enter':
+					submitCurrentCommand();
+					break;
+			}
+
+			commandInput.focus();
 		}
-
-		writeNewlineToTerm();
-	}
-
-	function writeNewlineToTerm() {
-		term.writeln('');
-
-		if (acceptInput) {
-			putPrompt();
-		}
-	}
-
-	function getCurrentTime() {
-		const dateNow = new Date()
-			.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' })
-			.split(':');
-		return dateNow[0] + ':' + dateNow[1];
-	}
-
-	function getPrompt() {
-		return '[' + getCurrentTime() + '] guest@ian.cowan.aero $ ';
-	}
-
-	function putPrompt() {
-		term.write(getPrompt());
-	}
-
-	function handleInput(input: string) {}
-
-	function acceptTermInput() {
-		acceptInput = true;
-		term.focus();
-	}
-
-	function denyTermInput() {
-		acceptInput = false;
-		term.blur();
 	}
 </script>
 
-<div class="mockup-window bg-base-300 m-10">
-	<div class="p-10 bg-black h-full" id="term-container">
-		<div id="terminal" />
-	</div>
+<svelte:window on:keydown={focusCommandInput} />
+
+<div class="fixed top-2 right-2">
+	<a href="https://www.linkedin.com/in/ian-cowan/" class="drop-shadow-lg shadow-white">
+		<Fa icon={faLinkedin} size="1.5x" class="inline hover:shadow-none" />
+	</a>
+	<a href="https://github.com/iccowan">
+		<Fa icon={faGithub} size="1.5x" class="inline drop-shadow-lg shadow-white hover:shadow-none" />
+	</a>
 </div>
 
+{#if termLines}
+	<div id="terminal-container" class="m-4">
+		<div class="terminal-header">
+			<span class="text-accent-focus">
+				<pre class="mb-0">
+            __/\__ 
+           `==/\==`              _____               _____ 
+ ____________/__\____________   |_   _|             / ____|
+/____________________________\    | |  __ _ _ __   | |     _____      ____ _ _ __
+  __||__||__/.--.\__||__||__      | | / _` | '_ \  | |    / _ \ \ /\ / / _` | '_ \
+ /__|___|___( {'><'} )___|___|__\    _| || (_| | | | | | |___| (_) \ V  V / (_| | | | |
+           _/`--`\_             |_____\__,_|_| |_|  \_____\___/ \_/\_/ \__,_|_| |_|
+          (/------\)
+        </pre>
+			</span>
+		</div>
+		{#each termLines as termLine}
+			<div class="terminal-line">
+				<span class="term-line-content text-accent-focus">
+					{#if termLine.htmlSafe}
+						{@html termLine.content}
+					{:else}
+						{termLine.content}
+					{/if}
+				</span>
+			</div>
+		{/each}
+		{#if displayInputLine}
+			<div class="input-line flex">
+				<span class="flex-none whitespace-pre-wrap">{lineLeader}</span>
+				<input id="command-input" bind:this={commandInput} bind:value={currentCommandContent} />
+				<span class="whitespace-pre-wrap">{currentCommandContent}</span>
+				<span
+					id="caret"
+					style="--caret-offset: {caretOffset}"
+					class="bg-accent-focus w-2.5 opacity-80 relative whitespace-pre-wrap text-accent-content"
+				>
+					{currentCharUnderCaret}
+				</span>
+			</div>
+		{/if}
+	</div>
+{/if}
+
 <style lang="scss">
+	input#command-input {
+		position: fixed;
+		opacity: 0;
+	}
+
+	span#caret {
+		left: calc(var(--caret-offset) * 0.6rem);
+	}
 </style>
