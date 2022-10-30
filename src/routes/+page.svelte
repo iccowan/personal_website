@@ -102,7 +102,7 @@
 	<div id="terminal-container" class="m-4">
 		<div class="terminal-header">
 			<span class="text-accent-focus">
-				<p>FooBart 🤖 v1.0.0</p>
+				<p>FooBart 🤖 Interactive Terminal Version 1.0.0</p>
 				<p>Kernel 🌽 Version 6.1-rc2</p>
 				<div>
 					<a href="https://www.linkedin.com/in/ian-cowan">
@@ -166,11 +166,19 @@
 		text-shadow: 0 0 5px hsl(var(--s));
 	}
 
+  @keyframes pulsate {
+    0% { filter: drop-shadow(0 0 100px hsl(var(--s))); }
+    50% { filter: drop-shadow(0 0 0 hsl(var(--s))); }
+    100% { filter: drop-shadow(0 0 100px hsl(var(--s))); }
+  }
+
 	:global(.icon-shadow path) {
 		filter: drop-shadow(0 0 100px hsl(var(--s)));
+    animation: pulsate 2s ease-out infinite;
 	}
 
 	:global(.icon-shadow:hover path) {
 		filter: none;
+    animation: none;
 	}
 </style>
