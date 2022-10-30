@@ -1,5 +1,5 @@
 <script type="ts">
-	import { onMount } from 'svelte';
+	import { afterUpdate, onMount } from 'svelte';
 	import type { TerminalLine } from '../models/TerminalLine';
 	import { aTerminalLine } from '../models/TerminalLine';
 	import Fa from 'svelte-fa';
@@ -24,6 +24,10 @@
 		setDefaultTermLines();
 		updateLineLeader('guest');
 		displayInputLine = true;
+	});
+
+	afterUpdate(() => {
+		window.scroll(0, document.body.scrollHeight);
 	});
 
 	function updateLineLeader(name: string) {
@@ -55,6 +59,7 @@
 			displayInputLine = true;
 		});
 		currentCommandContent = '';
+		caretOffset = 0;
 	}
 
 	function handleCalledCommand(currentCommandContent: string): Promise<void> {
