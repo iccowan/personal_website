@@ -4,36 +4,30 @@
 	import { aTerminalLine } from '../models/TerminalLine';
 	import Fa from 'svelte-fa';
 	import { faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons';
+	import { commands } from '../assets/commands';
 
 	let termLines: TerminalLine[];
 	let displayInputLine = false;
-	let userName = 'guest';
+	let userName: string;
 	let lineLeader: string;
+	$: lineLeader = `[${userName}@ian.cowan.aero ~]$ `;
 
 	let commandInput: HTMLInputElement;
 	let currentCommandContent = '';
 	let caretOffset = 0;
-	let currentCharUnderCaret: string;
-	$: {
-		const currentCharIdx = currentCommandContent.length + caretOffset;
-		currentCharUnderCaret =
-			caretOffset === 0 ? ' ' : currentCommandContent.substring(currentCharIdx, currentCharIdx + 1);
-	}
 
 	onMount(() => {
+		userName = localStorage.getItem('userName')
+			? (localStorage.getItem('userName') as string)
+			: 'guest';
 		setDefaultTermLines();
-		updateLineLeader('guest');
 		displayInputLine = true;
 	});
 
 	afterUpdate(() => {
+		localStorage.setItem('userName', userName);
 		window.scroll(0, document.body.scrollHeight);
 	});
-
-	function updateLineLeader(name: string) {
-		userName = name;
-		lineLeader = `[${userName}@ian.cowan.aero ~]$ `;
-	}
 
 	function setDefaultTermLines() {
 		termLines = [
@@ -46,6 +40,15 @@
 				.withHtmlSafe(true)
 				.build()
 		];
+
+		if (userName != 'guest') {
+			termLines = [
+				...termLines,
+				aTerminalLine()
+					.withContent(`🪃 Welcome back, ${userName}! I'm glad this didn't scare you too much :)`)
+					.build()
+			];
+		}
 	}
 
 	function moveCaretLeft() {
@@ -56,14 +59,18 @@
 		caretOffset = Math.min(0, caretOffset + 1);
 	}
 
+	function addTermLines(lines: TerminalLine[]) {
+		termLines = [...termLines, ...lines];
+	}
+
 	function submitCurrentCommand() {
 		displayInputLine = false;
-		termLines = [
-			...termLines,
+		addTermLines([
 			aTerminalLine()
 				.withContent(lineLeader + currentCommandContent)
 				.build()
-		];
+		]);
+
 		handleCalledCommand(currentCommandContent).then(() => {
 			displayInputLine = true;
 		});
@@ -71,26 +78,50 @@
 		caretOffset = 0;
 	}
 
+	function missingCommand(command: string) {
+		addTermLines([
+			aTerminalLine().withContent(`❓ foobart: ${command}`).build(),
+			aTerminalLine()
+				.withHtmlSafe(true)
+				.withContent("Command not found. For a list of available commands, type <cmd>'help'</cmd>")
+				.build()
+		]);
+	}
+
 	function handleCalledCommand(currentCommandContent: string): Promise<void> {
+		const args = currentCommandContent.split(' ');
+		const currentCommand = args[0];
+
 		return new Promise((resolve) => {
+			if (currentCommand === 'clear') {
+				termLines = [];
+			} else if (!(currentCommand in commands)) {
+				missingCommand(currentCommand);
+			} else {
+				const response = commands[currentCommand].callback(args);
+				addTermLines(response.terminalLines);
+
+				userName = response.data.userName === '' ? userName : response.data.userName;
+			}
+
 			resolve();
 		});
 	}
 
 	function focusCommandInput(event: KeyboardEvent) {
-		if (commandInput) {
-			switch (event.code) {
-				case 'ArrowLeft':
-					moveCaretLeft();
-					break;
-				case 'ArrowRight':
-					moveCaretRight();
-					break;
-				case 'Enter':
-					submitCurrentCommand();
-					break;
-			}
+		switch (event.code) {
+			case 'ArrowLeft':
+				moveCaretLeft();
+				break;
+			case 'ArrowRight':
+				moveCaretRight();
+				break;
+			case 'Enter':
+				submitCurrentCommand();
+				break;
+		}
 
+		if (commandInput !== null) {
 			commandInput.focus();
 		}
 	}
@@ -102,7 +133,7 @@
 	<div id="terminal-container" class="m-4">
 		<div class="terminal-header">
 			<span class="text-accent-focus">
-				<p>FooBart 🤖 Interactive Terminal Version 1.0.0</p>
+				<p>foobart 🤖 Interactive Terminal Version 1.0.0</p>
 				<p>Kernel 🌽 Version 6.1-rc2</p>
 				<div>
 					<a href="https://www.linkedin.com/in/ian-cowan">
@@ -144,9 +175,7 @@
 					id="caret"
 					style="--caret-offset: {caretOffset}"
 					class="bg-accent-focus w-2.5 opacity-80 relative whitespace-pre-wrap text-accent-content"
-				>
-					{currentCharUnderCaret}
-				</span>
+				/>
 			</div>
 		{/if}
 	</div>
@@ -158,27 +187,50 @@
 		opacity: 0;
 	}
 
+	@keyframes caret-flash {
+		0% {
+			transform: scaleY(1);
+		}
+
+		50% {
+			transform: scaleY(0);
+		}
+
+		100% {
+			transform: scaleY(1);
+		}
+	}
+
 	span#caret {
 		left: calc(var(--caret-offset) * 0.6rem);
+		opacity: 0.7;
+		z-index: -1;
+		animation: caret-flash 1s ease-out infinite;
 	}
 
 	:global(cmd) {
 		text-shadow: 0 0 5px hsl(var(--s));
 	}
 
-  @keyframes pulsate {
-    0% { filter: drop-shadow(0 0 100px hsl(var(--s))); }
-    50% { filter: drop-shadow(0 0 0 hsl(var(--s))); }
-    100% { filter: drop-shadow(0 0 100px hsl(var(--s))); }
-  }
+	@keyframes pulsate {
+		0% {
+			filter: drop-shadow(0 0 100px hsl(var(--s)));
+		}
+		50% {
+			filter: drop-shadow(0 0 0 hsl(var(--s)));
+		}
+		100% {
+			filter: drop-shadow(0 0 100px hsl(var(--s)));
+		}
+	}
 
 	:global(.icon-shadow path) {
 		filter: drop-shadow(0 0 100px hsl(var(--s)));
-    animation: pulsate 2s ease-out infinite;
+		animation: pulsate 2s ease-out infinite;
 	}
 
 	:global(.icon-shadow:hover path) {
 		filter: none;
-    animation: none;
+		animation: none;
 	}
 </style>

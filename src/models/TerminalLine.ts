@@ -28,3 +28,7 @@ export class TerminalLineBuilder {
 export function aTerminalLine() {
 	return new TerminalLineBuilder();
 }
+
+export function aNewTerminalLine() {
+	return aTerminalLine().withHtmlSafe(true).withContent('<br>').build();
+}
