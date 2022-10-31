@@ -4,13 +4,15 @@ import {
 	type CommandResponse
 } from '../models/CommandResponse';
 import type { CommandList } from '../models/CommandList';
-import { aTerminalLine, aNewTerminalLine } from '../models/TerminalLine';
+import { aTerminalLine, aNewTerminalLine, type TerminalLine } from '../models/TerminalLine';
 
-const empty = (): CommandResponse => aCommandResponse().build();
+const empty = (_args: string[], terminalLines: TerminalLine[]): CommandResponse =>
+	aCommandResponse().withTerminalLines(terminalLines).build();
 
-const showHelp = () => {
+const showHelp = (_args: string, terminalLines: TerminalLine[]) => {
 	return aCommandResponse()
 		.withTerminalLines([
+			...terminalLines,
 			aNewTerminalLine(),
 			...Object.keys(commands).map((commandName: string) => {
 				const cmd = commands[commandName];
@@ -31,26 +33,40 @@ const showHelp = () => {
 		.build();
 };
 
-const openGitHub = (): CommandResponse => {
+const openGitHub = (_args: string[], terminalLines: TerminalLine[]): CommandResponse => {
 	window.open('https://github.com/iccowan', '_blank');
 	return aCommandResponse()
+		.withTerminalLines(terminalLines)
 		.withTerminalLine(aTerminalLine().withContent('Opening GitHub...').build())
 		.build();
 };
 
-const openLinkedIn = (): CommandResponse => {
+const openLinkedIn = (_args: string[], terminalLines: TerminalLine[]): CommandResponse => {
 	window.open('https://www.linkedin.com/in/ian-cowan', '_blank');
 	return aCommandResponse()
+		.withTerminalLines(terminalLines)
 		.withTerminalLine(aTerminalLine().withContent('Opening LinkedIn...').build())
 		.build();
 };
 
-const whoAmI = (args: string[]): CommandResponse => {
-	let terminalLines = [aTerminalLine().build()];
+const email = (_args: string[], terminalLines: TerminalLine[]): CommandResponse => {
+	window.open('mailto:ian@cowan.aero', '_blank');
+	return aCommandResponse()
+		.withTerminalLines(terminalLines)
+		.withTerminalLine(aTerminalLine().withContent('Emailing ian@cowan.aero...').build())
+		.build();
+};
+
+const clear = (): CommandResponse => {
+	return aCommandResponse().build();
+};
+
+const whoAmI = (args: string[], terminalLines: TerminalLine[]): CommandResponse => {
 	let userName = '';
 
 	if (args.length === 1) {
 		terminalLines = [
+			...terminalLines,
 			aTerminalLine()
 				.withContent('Call this command with your name to tell us who you are!')
 				.build(),
@@ -60,6 +76,7 @@ const whoAmI = (args: string[]): CommandResponse => {
 	} else {
 		userName = args[1];
 		terminalLines = [
+			...terminalLines,
 			aTerminalLine()
 				.withContent('Nice to meet you, ' + userName + '!')
 				.build()
@@ -100,12 +117,12 @@ export const commands: CommandList = {
 	},
 	email: {
 		description: 'email me 📨',
-		callback: empty,
+		callback: email,
 		show: true
 	},
 	clear: {
 		description: 'clear the terminal screen 🧽',
-		callback: empty,
+		callback: clear,
 		show: true
 	},
 	help: {
@@ -114,6 +131,11 @@ export const commands: CommandList = {
 		show: true
 	},
 	sudo: {
+		description: 'hidden',
+		callback: empty,
+		show: false
+	},
+	nvim: {
 		description: 'hidden',
 		callback: empty,
 		show: false

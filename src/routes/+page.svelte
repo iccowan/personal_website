@@ -93,13 +93,11 @@
 		const currentCommand = args[0];
 
 		return new Promise((resolve) => {
-			if (currentCommand === 'clear') {
-				termLines = [];
-			} else if (!(currentCommand in commands)) {
+			if (!(currentCommand in commands)) {
 				missingCommand(currentCommand);
 			} else {
-				const response = commands[currentCommand].callback(args);
-				addTermLines(response.terminalLines);
+				const response = commands[currentCommand].callback(args, termLines);
+				termLines = response.terminalLines;
 
 				userName = response.data.userName === '' ? userName : response.data.userName;
 			}
