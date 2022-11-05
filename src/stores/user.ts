@@ -1,8 +1,8 @@
 import { browser } from '$app/environment';
-import { writable } from 'svelte/store';
+import { writable, type Writable } from 'svelte/store';
 
 const localStorageKey = 'userName';
-export const user =
+export const user: Writable<string> =
   browser && window.localStorage.getItem(localStorageKey)
     ? writable(window.localStorage.getItem(localStorageKey) as string)
     : writable('guest');

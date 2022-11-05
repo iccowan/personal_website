@@ -6,15 +6,17 @@
   import { faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons';
   import { commands } from '../assets/commands';
   import { user } from '../stores/user';
+  import { addCommand, commandHistory } from '../stores/commands';
 
   let termLines: TerminalLine[];
   let displayInputLine = false;
   let lineLeader: string;
   let userName: string;
-
-  const unsubscribeUser = user.subscribe((value) => {
-    userName = value;
-  });
+  let unsubscribeUser = user.subscribe((value) => userName = value);
+  let pastCommands: string[];
+  let commandHistoryLocation = 0;
+  let unsubscribeCommandHistory = commandHistory.subscribe((value) => pastCommands = value);
+  let prevCtrl = false;
 
   $: lineLeader = `[${userName}@ian.cowan.aero ~]$ `;
 
@@ -33,6 +35,7 @@
 
   onDestroy(() => {
     unsubscribeUser();
+    unsubscribeCommandHistory();
   });
 
   function setDefaultTermLines() {
@@ -73,13 +76,60 @@
     termLines = [...termLines, ...lines];
   }
 
+  function showLastCommand() {
+    if (commandHistoryLocation > 0) {
+      currentCommandContent = pastCommands[--commandHistoryLocation];
+      caretOffset = 0;
+    }
+  }
+
+  function showNextCommand() {
+    if (commandHistoryLocation < pastCommands.length - 1) {
+      currentCommandContent = pastCommands[++commandHistoryLocation];
+      caretOffset = 0;
+    } else {
+      clearCommand();
+    }
+  }
+
+  function removeCommand(prevCtrl: boolean) {
+    if (!prevCtrl) {
+      return;
+    }
+
+    addTermLines([
+      aTerminalLine().withContent(lineLeader +  currentCommandContent).build()
+    ]);
+    
+    clearCommand()
+  }
+
+  function clearInput(prevCtrl: boolean) {
+    if (!prevCtrl) {
+      return;
+    }
+
+    clearCommand();
+    termLines = [];
+  }
+
+  function clearCommand() {
+    commandHistoryLocation = pastCommands.length;
+    currentCommandContent = '';
+  }
+
   function submitCurrentCommand() {
     displayInputLine = false;
+    commandHistoryLocation = pastCommands.length;
+
     addTermLines([
       aTerminalLine()
         .withContent(lineLeader + currentCommandContent)
         .build(),
     ]);
+
+    commandHistoryLocation++;
+    addCommand(currentCommandContent);
 
     handleCalledCommand(currentCommandContent).then(() => {
       displayInputLine = true;
@@ -124,14 +174,39 @@
       case 'ArrowRight':
         moveCaretRight();
         break;
+      case 'ArrowUp':
+        showLastCommand();
+        break;
+      case 'ArrowDown':
+        showNextCommand();
+        break;
+      case 'ControlLeft':
+      case 'ControlRight':
+        prevCtrl = true;
+        break;
+      case 'KeyC':
+        removeCommand(prevCtrl);
+        break;
+      case 'KeyL':
+        clearInput(prevCtrl);
+        break;
       case 'Enter':
         submitCurrentCommand();
         break;
     }
 
+    if (event.code !== 'ControlLeft' && event.code !== 'ControlRight') {
+      prevCtrl = false;
+    }
+
     if (commandInput !== null) {
       commandInput.focus();
     }
+  }
+
+  function preventSelect(element: Event) {
+    const target = element.target as HTMLInputElement;
+    target.selectionStart = target.selectionEnd;
   }
 </script>
 
@@ -181,6 +256,7 @@
           id="command-input"
           bind:this={commandInput}
           bind:value={currentCommandContent}
+          on:select={preventSelect}
         />
         <span class="whitespace-pre-wrap">{currentCommandContent}</span>
         <span
