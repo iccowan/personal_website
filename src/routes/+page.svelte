@@ -1,15 +1,21 @@
 <script type="ts">
-  import { afterUpdate, onMount } from 'svelte';
+  import { afterUpdate, onMount, onDestroy } from 'svelte';
   import type { TerminalLine } from '../models/TerminalLine';
   import { aTerminalLine } from '../models/TerminalLine';
   import Fa from 'svelte-fa';
   import { faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons';
   import { commands } from '../assets/commands';
+  import { user } from '../stores/user';
 
   let termLines: TerminalLine[];
   let displayInputLine = false;
-  let userName: string;
   let lineLeader: string;
+  let userName: string;
+
+  const unsubscribeUser = user.subscribe((value) => {
+    userName = value;
+  });
+
   $: lineLeader = `[${userName}@ian.cowan.aero ~]$ `;
 
   let commandInput: HTMLInputElement;
@@ -17,16 +23,16 @@
   let caretOffset = 0;
 
   onMount(() => {
-    userName = localStorage.getItem('userName')
-      ? (localStorage.getItem('userName') as string)
-      : 'guest';
     setDefaultTermLines();
     displayInputLine = true;
   });
 
   afterUpdate(() => {
-    localStorage.setItem('userName', userName);
     window.scroll(0, document.body.scrollHeight);
+  });
+
+  onDestroy(() => {
+    unsubscribeUser();
   });
 
   function setDefaultTermLines() {
@@ -104,9 +110,6 @@
       } else {
         const response = commands[currentCommand].callback(args, termLines);
         termLines = response.terminalLines;
-
-        userName =
-          response.data.userName === '' ? userName : response.data.userName;
       }
 
       resolve();

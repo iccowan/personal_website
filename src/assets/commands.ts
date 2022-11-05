@@ -9,6 +9,7 @@ import {
   aNewTerminalLine,
   type TerminalLine,
 } from '../models/TerminalLine';
+import { getUser, setUser } from '../stores/user';
 
 const empty = (
   _args: string[],
@@ -16,7 +17,7 @@ const empty = (
 ): CommandResponse =>
   aCommandResponse().withTerminalLines(terminalLines).build();
 
-const showHelp = (_args: string, terminalLines: TerminalLine[]) => {
+const showHelp = (_args: string[], terminalLines: TerminalLine[]) => {
   return aCommandResponse()
     .withTerminalLines([
       ...terminalLines,
@@ -90,8 +91,21 @@ const whoAmI = (
   terminalLines: TerminalLine[]
 ): CommandResponse => {
   let userName = '';
+  console.log(args);
 
   if (args.length === 1) {
+    userName = getUser();
+    if (userName && userName !== '' && userName !== 'guest') {
+      terminalLines = [
+        ...terminalLines,
+        aTerminalLine()
+          .withContent(
+            `I already know you, ${userName}! If you would like to change your name, follow the instructions below`
+          )
+          .build(),
+      ];
+    }
+
     terminalLines = [
       ...terminalLines,
       aTerminalLine()
@@ -114,6 +128,8 @@ const whoAmI = (
         .withContent('Nice to meet you, ' + userName + '!')
         .build(),
     ];
+
+    setUser(userName);
   }
 
   return aCommandResponse()
