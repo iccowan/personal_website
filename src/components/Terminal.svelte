@@ -89,10 +89,12 @@
     }
 
     addTermLines([
-      aTerminalLine().withContent(lineLeader +  currentCommandContent).build()
+      aTerminalLine()
+        .withContent(lineLeader + currentCommandContent)
+        .build(),
     ]);
-    
-    clearCommand()
+
+    clearCommand();
   }
 
   function clearInput(prevCtrl: boolean) {
@@ -211,10 +213,20 @@
         <p>Kernel 🌽 Version 6.1-rc2</p>
         <div>
           <a href="https://www.linkedin.com/in/ian-cowan">
-            <Fa icon={faLinkedin} size="1.5x" class="inline icon-shadow" id="icon-1" />
+            <Fa
+              icon={faLinkedin}
+              size="1.5x"
+              class="inline icon-shadow"
+              id="icon-1"
+            />
           </a>
           <a href="https://github.com/iccowan">
-            <Fa icon={faGithub} size="1.5x" class="inline icon-shadow" id="icon-2" />
+            <Fa
+              icon={faGithub}
+              size="1.5x"
+              class="inline icon-shadow"
+              id="icon-2"
+            />
           </a>
         </div>
         <pre class="mb-0">
@@ -289,5 +301,17 @@
 
   :global(cmd) {
     text-shadow: 0 0 5px hsl(var(--s));
+  }
+
+  :global(.tech-img) {
+    display: inline-block;
+    width: 50px;
+  }
+
+  :global(.tech-img-container) {
+    width: 150px;
+    text-align: center;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
   }
 </style>

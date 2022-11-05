@@ -20,14 +20,34 @@
   }
 }
 
-@for $i from 1 through 2 {
-  :global(#icon-#{$i}.icon-shadow path) {
-    filter: drop-shadow(0 0 100px hsl(var(--s)));
-    animation: pulsate #{calc((random(1000) / 1000) * 2 + 1)}s ease-out infinite;
+@keyframes pulsate-a {
+  0% {
+    filter: drop-shadow(0 0 10px hsl(var(--s)));
+  }
+  50% {
+    filter: drop-shadow(0 0 0 hsl(var(--s)));
+  }
+  100% {
+    filter: drop-shadow(0 0 10px hsl(var(--s)));
   }
 }
 
-:global(.icon-shadow:hover path) {
+@for $i from 1 through 2 {
+  :global(#icon-#{$i}.icon-shadow path) {
+    filter: drop-shadow(0 0 100px hsl(var(--s)));
+    animation: pulsate
+      #{calc((random(1000) / 1000) * 2 + 1)}s
+      ease-out
+      infinite;
+  }
+}
+
+:global(a.a-shadow) {
+  filter: drop-shadow(0 0 10px hsl(var(--s)));
+  animation: pulsate-a #{calc((random(1000) / 1000) * 2 + 1)}s ease-out infinite;
+}
+
+:global(.icon-shadow:hover path, .a-shadow:hover) {
   filter: none;
   animation: none;
 }

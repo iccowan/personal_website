@@ -10,6 +10,7 @@ import {
   type TerminalLine,
 } from '../models/TerminalLine';
 import { getUser, setUser } from '../stores/user';
+import { myBio, myTechnologies } from './info';
 
 const empty = (
   _args: string[],
@@ -86,6 +87,14 @@ const clear = (): CommandResponse => {
   return aCommandResponse().build();
 };
 
+const whoIsMe = (_args: string[], terminalLines: TerminalLine[]) => {
+  return aCommandResponse()
+    .withTerminalLines([
+      ...terminalLines,
+      aTerminalLine().withHtmlSafe(true).withContent(myBio).build(),
+    ])
+    .build();
+};
 const whoAmI = (
   args: string[],
   terminalLines: TerminalLine[]
@@ -138,29 +147,121 @@ const whoAmI = (
     .build();
 };
 
+const techs = (_args: string[], terminalLines: TerminalLine[]) => {
+  return aCommandResponse().withTerminalLines([
+    ...terminalLines,
+    ...myTechnologies.map((tech) =>
+      aTerminalLine()
+        .withHtmlSafe(true)
+        .withContent(
+          '<div class="tech-img-container"><img class="tech-img" src="' +
+            tech.logoUrl +
+            '" alt="' +
+            tech.name +
+            '" /><p>' +
+            tech.name +
+            '</p></div>'
+        )
+        .build()
+    ),
+  ]);
+};
+
 const sudo = (
   _args: string[],
   terminalLines: TerminalLine[]
 ): CommandResponse => {
   terminalLines = [
     ...terminalLines,
-    aTerminalLine().withContent('We trust you have received the usual lecture from the local System Administrator. It usually boils down to these three things:').build(),
+    aTerminalLine()
+      .withContent(
+        'We trust you have received the usual lecture from the local System Administrator. It usually boils down to these three things:'
+      )
+      .build(),
     aNewTerminalLine(),
-    aTerminalLine().withHtmlSafe(true).withContent('&nbsp;&nbsp;&nbsp;#1) Respect the privacy of others.').build(),
-    aTerminalLine().withHtmlSafe(true).withContent('&nbsp;&nbsp;&nbsp;#2) Think before you type.').build(),
-    aTerminalLine().withHtmlSafe(true).withContent('&nbsp;&nbsp;&nbsp;#1) Respect the privacy of others.').build(),
-    aTerminalLine().withHtmlSafe(true).withContent('&nbsp;&nbsp;&nbsp;#3) With great power comes great responsibility.').build(),
+    aTerminalLine()
+      .withHtmlSafe(true)
+      .withContent('&nbsp;&nbsp;&nbsp;#1) Respect the privacy of others.')
+      .build(),
+    aTerminalLine()
+      .withHtmlSafe(true)
+      .withContent('&nbsp;&nbsp;&nbsp;#2) Think before you type.')
+      .build(),
+    aTerminalLine()
+      .withHtmlSafe(true)
+      .withContent('&nbsp;&nbsp;&nbsp;#1) Respect the privacy of others.')
+      .build(),
+    aTerminalLine()
+      .withHtmlSafe(true)
+      .withContent(
+        '&nbsp;&nbsp;&nbsp;#3) With great power comes great responsibility.'
+      )
+      .build(),
     aNewTerminalLine(),
-    aTerminalLine().withContent('You are not in the sudoers file. This incident will be reported.').build()
-  ]
+    aTerminalLine()
+      .withContent(
+        'You are not in the sudoers file. This incident will be reported.'
+      )
+      .build(),
+  ];
 
   return aCommandResponse().withTerminalLines(terminalLines).build();
-}
+};
+
+const nvim = (
+  _args: string[],
+  terminalLines: TerminalLine[]
+): CommandResponse => {
+  terminalLines = [
+    ...terminalLines,
+    aTerminalLine()
+      .withHtmlSafe(true)
+      .withContent(
+        'Unfortunately, we don\'t support Ian\'s favorite editor, NeoVim, at the moment, however you can check out its awesomeness <a href="https://neovim.io/" target="_none" class="a-shadow">HERE!</a>'
+      )
+      .build(),
+  ];
+
+  return aCommandResponse().withTerminalLines(terminalLines).build();
+};
+
+const echo = (
+  args: string[],
+  terminalLines: TerminalLine[]
+): CommandResponse => {
+  let newTermLines: TerminalLine[] = [];
+
+  if (args.length === 1) {
+    newTermLines = [
+      aTerminalLine()
+        .withContent('Call this command to print out some text!')
+        .build(),
+      aTerminalLine()
+        .withHtmlSafe(true)
+        .withContent('💡 <cmd>echo [text]</cmd>')
+        .build(),
+      aTerminalLine()
+        .withHtmlSafe(true)
+        .withContent(
+          '💡 Example: <cmd>echo Some text to print to the terminal</cmd>'
+        )
+        .build(),
+    ];
+  } else {
+    newTermLines = [
+      aTerminalLine().withContent(args.slice(1).join(' ')).build(),
+    ];
+  }
+
+  return aCommandResponse()
+    .withTerminalLines([...terminalLines, ...newTermLines])
+    .build();
+};
 
 export const commands: CommandList = {
   whois: {
     description: 'who is me? 🤖',
-    callback: empty,
+    callback: whoIsMe,
     show: true,
   },
   whoami: {
@@ -171,6 +272,11 @@ export const commands: CommandList = {
   projects: {
     description: 'some of my coding projects 🏗️',
     callback: empty,
+    show: true,
+  },
+  techs: {
+    description: "some of the technologies I'm familiar with 📠",
+    callback: techs,
     show: true,
   },
   github: {
@@ -205,12 +311,12 @@ export const commands: CommandList = {
   },
   nvim: {
     description: 'hidden',
-    callback: empty,
+    callback: nvim,
     show: false,
   },
   echo: {
     description: 'hidden',
-    callback: empty,
-    show: false
-  }
+    callback: echo,
+    show: false,
+  },
 };

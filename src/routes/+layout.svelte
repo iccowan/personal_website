@@ -1,5 +1,5 @@
 <script type="ts">
-  import { title } from "../stores/title";
+  import { title } from '../stores/title';
   import { CLI_PAGE, GUI_PAGE, page } from '../stores/page';
 </script>
 
