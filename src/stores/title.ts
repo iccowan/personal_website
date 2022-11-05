@@ -1,7 +1,7 @@
-import { writable } from "svelte/store";
+import { writable, type Writable } from "svelte/store";
 
 const titleLeader = 'Ian Cowan';
-export const title = writable(titleLeader);
+export const title: Writable<string> = writable(titleLeader);
 
 export function setTitle(newTitle: string) {
   title.update(() => {

@@ -4,9 +4,11 @@
   import Terminal from '../components/Terminal.svelte';
   import Toast from '../components/Toast.svelte';
   import { onMount } from 'svelte';
+  import { CLI_PAGE, setPage } from '../stores/page';
 
   onMount(() => {
     setTitle('CLI');
+    setPage(CLI_PAGE);
   })
 </script>
 
