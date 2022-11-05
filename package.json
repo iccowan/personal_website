@@ -31,6 +31,8 @@
   "type": "module",
   "dependencies": {
     "@fortawesome/free-brands-svg-icons": "^6.2.0",
+    "@fortawesome/free-solid-svg-icons": "^6.2.0",
+    "@tailwindcss/typography": "^0.5.7",
     "autoprefixer": "^10.4.13",
     "daisyui": "^2.36.1",
     "postcss": "^8.4.18",
