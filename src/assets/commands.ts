@@ -138,6 +138,25 @@ const whoAmI = (
     .build();
 };
 
+const sudo = (
+  _args: string[],
+  terminalLines: TerminalLine[]
+): CommandResponse => {
+  terminalLines = [
+    ...terminalLines,
+    aTerminalLine().withContent('We trust you have received the usual lecture from the local System Administrator. It usually boils down to these three things:').build(),
+    aNewTerminalLine(),
+    aTerminalLine().withHtmlSafe(true).withContent('&nbsp;&nbsp;&nbsp;#1) Respect the privacy of others.').build(),
+    aTerminalLine().withHtmlSafe(true).withContent('&nbsp;&nbsp;&nbsp;#2) Think before you type.').build(),
+    aTerminalLine().withHtmlSafe(true).withContent('&nbsp;&nbsp;&nbsp;#1) Respect the privacy of others.').build(),
+    aTerminalLine().withHtmlSafe(true).withContent('&nbsp;&nbsp;&nbsp;#3) With great power comes great responsibility.').build(),
+    aNewTerminalLine(),
+    aTerminalLine().withContent('You are not in the sudoers file. This incident will be reported.').build()
+  ]
+
+  return aCommandResponse().withTerminalLines(terminalLines).build();
+}
+
 export const commands: CommandList = {
   whois: {
     description: 'who is me? 🤖',
@@ -181,7 +200,7 @@ export const commands: CommandList = {
   },
   sudo: {
     description: 'hidden',
-    callback: empty,
+    callback: sudo,
     show: false,
   },
   nvim: {
@@ -189,4 +208,9 @@ export const commands: CommandList = {
     callback: empty,
     show: false,
   },
+  echo: {
+    description: 'hidden',
+    callback: empty,
+    show: false
+  }
 };
