@@ -1,7 +1,7 @@
 <script type="ts">
   import Fa from 'svelte-fa';
   import { faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons';
-  import { myBio, myTechnologies } from '../assets/info';
+  import { myBio, myCerts, myProjects, myTechnologies } from '../assets/info';
 </script>
 
 <div
@@ -11,7 +11,7 @@
     <h1 id="intro">
       👨‍💻 Ian Cowan
       <span class="text-base">
-        <a href="https://www.linkedin.com/in/ian-cowan">
+        <a href="https://www.linkedin.com/in/ian-cowan" target="_none">
           <Fa
             icon={faLinkedin}
             size="1.5x"
@@ -19,7 +19,7 @@
             id="icon-1"
           />
         </a>
-        <a href="https://github.com/iccowan">
+        <a href="https://github.com/iccowan" target="_none">
           <Fa
             icon={faGithub}
             size="1.5x"
@@ -32,6 +32,18 @@
     <h2>🫱‍🫲 Introductions</h2>
     <p>{@html myBio}</p>
     <h2 id="proj">🏗️ Projects</h2>
+    {#each myProjects as project}
+      <h3>
+        {project.name}
+        <a href={project.githubRepo} target="_none"
+          ><Fa icon={faGithub} class="icon-shadow inline" id="icon-1" /></a
+        >
+      </h3>
+      <a href={project.url} class="mt-0 a-shadow no-underline" target="_none"
+        >Check it out!</a
+      >
+      <p>{project.description}</p>
+    {/each}
   </article>
   <article class="prose">
     <h1 class="hidden xl:block">&nbsp;</h1>
@@ -47,5 +59,13 @@
       </div>
     {/each}
     <div class="clear-left" />
+    <h2 id="certs">✈️ Pilot Certificates</h2>
+    {#each myCerts as cert}
+      <div>
+        <h3 class="inline">{cert.name}</h3>
+        <p class="inline"><i>{cert.initialDate}</i></p>
+      </div>
+      <p class="mt-0"><i>{cert.ratings.join(', ')}</i></p>
+    {/each}
   </article>
 </div>

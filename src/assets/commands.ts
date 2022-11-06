@@ -10,13 +10,7 @@ import {
   type TerminalLine,
 } from '../models/TerminalLine';
 import { getUser, setUser } from '../stores/user';
-import { myBio, myTechnologies } from './info';
-
-const empty = (
-  _args: string[],
-  terminalLines: TerminalLine[]
-): CommandResponse =>
-  aCommandResponse().withTerminalLines(terminalLines).build();
+import { myBio, myCerts, myProjects, myTechnologies } from './info';
 
 const showHelp = (_args: string[], terminalLines: TerminalLine[]) => {
   return aCommandResponse()
@@ -30,11 +24,7 @@ const showHelp = (_args: string[], terminalLines: TerminalLine[]) => {
           return aTerminalLine()
             .withHtmlSafe(true)
             .withContent(
-              '<cmd>' +
-                commandName +
-                '</cmd>' +
-                '<br>&nbsp;&nbsp;&nbsp;  - ' +
-                cmd.description
+              `<cmd>${commandName}</cmd><br />&nbsp;&nbsp;&nbsp;  - ${cmd.description}`
             )
             .build();
         }
@@ -147,24 +137,88 @@ const whoAmI = (
     .build();
 };
 
+const projects = (_args: string[], terminalLines: TerminalLine[]) => {
+  let newTermLines: TerminalLine[] = [];
+
+  for (let i = 0; i < myProjects.length; i++) {
+    const project = myProjects[i];
+
+    newTermLines = [
+      ...newTermLines,
+      ...[
+        aNewTerminalLine(),
+        aTerminalLine()
+          .withHtmlSafe(true)
+          .withContent(
+            `<b>${project.name}</b> - <a href="${project.url}" target="_none" class="a-shadow">Check it out!</a>`
+          )
+          .build(),
+        aTerminalLine()
+          .withHtmlSafe(true)
+          .withContent('<i>' + project.description + '</i>')
+          .build(),
+        aTerminalLine()
+          .withHtmlSafe(true)
+          .withContent(
+            `&nbsp;&nbsp;&nbsp;<a href="${project.githubRepo}" target="_none" class="a-shadow"><i>View Source on GitHub</i></a>`
+          )
+          .build(),
+        aNewTerminalLine(),
+      ],
+    ];
+  }
+
+  return aCommandResponse()
+    .withTerminalLines([...terminalLines, ...newTermLines])
+    .build();
+};
+
+const certs = (_args: string[], terminalLines: TerminalLine[]) => {
+  let newTermLines: TerminalLine[] = [];
+
+  for (let i = 0; i < myCerts.length; i++) {
+    const cert = myCerts[i];
+
+    newTermLines = [
+      ...newTermLines,
+      ...[
+        aNewTerminalLine(),
+        aTerminalLine()
+          .withHtmlSafe(true)
+          .withContent(`<b>${cert.name}</b>`)
+          .build(),
+        aTerminalLine()
+          .withHtmlSafe(true)
+          .withContent(`<i>${cert.ratings.join(', ')}</i>`)
+          .build(),
+        aTerminalLine()
+          .withHtmlSafe(true)
+          .withContent(`&nbsp;&nbsp;&nbsp;<i>${cert.initialDate}</i>`)
+          .build(),
+        aNewTerminalLine(),
+      ],
+    ];
+  }
+
+  return aCommandResponse()
+    .withTerminalLines([...terminalLines, ...newTermLines])
+    .build();
+};
+
 const techs = (_args: string[], terminalLines: TerminalLine[]) => {
-  return aCommandResponse().withTerminalLines([
-    ...terminalLines,
-    ...myTechnologies.map((tech) =>
-      aTerminalLine()
-        .withHtmlSafe(true)
-        .withContent(
-          '<div class="tech-img-container"><img class="tech-img" src="' +
-            tech.logoUrl +
-            '" alt="' +
-            tech.name +
-            '" /><p>' +
-            tech.name +
-            '</p></div>'
-        )
-        .build()
-    ),
-  ]);
+  return aCommandResponse()
+    .withTerminalLines([
+      ...terminalLines,
+      ...myTechnologies.map((tech) =>
+        aTerminalLine()
+          .withHtmlSafe(true)
+          .withContent(
+            `<div class="tech-img-container"><img class="tech-img" src="${tech.logoUrl}" alt="${tech.name}" /><p>${tech.name}</p></div>`
+          )
+          .build()
+      ),
+    ])
+    .build();
 };
 
 const sudo = (
@@ -269,9 +323,14 @@ export const commands: CommandList = {
     callback: whoAmI,
     show: true,
   },
+  certs: {
+    description: 'my pilot certificates ✈️',
+    callback: certs,
+    show: true,
+  },
   projects: {
     description: 'some of my coding projects 🏗️',
-    callback: empty,
+    callback: projects,
     show: true,
   },
   techs: {

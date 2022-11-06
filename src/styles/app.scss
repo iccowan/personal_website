@@ -44,7 +44,7 @@
 
 :global(a.a-shadow) {
   filter: drop-shadow(0 0 10px hsl(var(--s)));
-  animation: pulsate-a #{calc((random(1000) / 1000) * 2 + 1)}s ease-out infinite;
+  animation: pulsate-a 2s ease-out infinite;
 }
 
 :global(.icon-shadow:hover path, .a-shadow:hover) {

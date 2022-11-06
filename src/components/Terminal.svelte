@@ -209,10 +209,10 @@
   <div id="terminal-container" class="m-4">
     <div class="terminal-header">
       <span class="text-accent-focus">
-        <p>foobart 🤖 Interactive Terminal Version 1.0.0</p>
+        <p>foobart 🤖 Interactive Terminal Version 0.0.1</p>
         <p>Kernel 🌽 Version 6.1-rc2</p>
         <div>
-          <a href="https://www.linkedin.com/in/ian-cowan">
+          <a href="https://www.linkedin.com/in/ian-cowan" target="_none">
             <Fa
               icon={faLinkedin}
               size="1.5x"
@@ -220,7 +220,7 @@
               id="icon-1"
             />
           </a>
-          <a href="https://github.com/iccowan">
+          <a href="https://github.com/iccowan" target="_none">
             <Fa
               icon={faGithub}
               size="1.5x"
