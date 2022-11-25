@@ -243,12 +243,12 @@ const sudo = (
       .build(),
     aTerminalLine()
       .withHtmlSafe(true)
-      .withContent('&nbsp;&nbsp;&nbsp;#1) Respect the privacy of others.')
+      .withContent('&nbsp;&nbsp;&nbsp;#3) Respect the privacy of others.')
       .build(),
     aTerminalLine()
       .withHtmlSafe(true)
       .withContent(
-        '&nbsp;&nbsp;&nbsp;#3) With great power comes great responsibility.'
+        '&nbsp;&nbsp;&nbsp;#4) With great power comes great responsibility.'
       )
       .build(),
     aNewTerminalLine(),
