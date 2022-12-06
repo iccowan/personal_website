@@ -1,0 +1,45 @@
+name: deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        required: true
+        options:
+          - qa
+          - staging
+          - production
+
+  push:
+    branches:
+      - main
+
+jobs:
+  staging:
+    uses: iccowan/personal_website/.github/workflows/deploy-to-railway.yml@main
+    with:
+      environment: 'qa'
+    secrets:
+      railway_token: ${{ secrets.railway_token }}
+
+    if: ${{ github.inputs.environment == 'qa' }}
+
+  staging:
+    uses: iccowan/personal_website/.github/workflows/deploy-to-railway.yml@main
+    with:
+      environment: 'staging'
+    secrets:
+      railway_token: ${{ secrets.railway_token }}
+
+    if: ${{ github.inputs.environment == 'staging' || (github.ref == 'refs/heads/main' && github.event_name != 'workflow_dispatch') }}
+
+  production:
+    uses: iccowan/personal_website/.github/workflows/deploy-to-railway.yml@main
+    with:
+      environment: 'production'
+    secrets:
+      railway_token: ${{ secrets.RAILWAY_TOKEN }}
+
+    if: ${{ github.inputs.environment == 'production' }}
+

@@ -1,0 +1,28 @@
+name: 🚄 deploy to railway
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+    secrets:
+      railway_token:
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    steps:
+      - name: 🗃️ checkout code
+        uses: actions/checkout@v3
+
+      - name: 🚉 setup raiway cli
+        run: curl -fsSL https://railway.app/install.sh | sh
+
+      - name: 🚄 push to railway
+        run: railway up
+        env:
+          RAILWAY_TOKEN: ${{ secrets.railway_token }}
