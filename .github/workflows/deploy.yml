@@ -16,7 +16,7 @@ on:
       - main
 
 jobs:
-  staging:
+  qa:
     uses: iccowan/personal_website/.github/workflows/deploy-to-railway.yml@main
     with:
       environment: 'qa'
