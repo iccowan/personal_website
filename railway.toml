@@ -1,6 +1,7 @@
 [build]
 builder = "nixpacks"
 buildCommand = "yarn run build"
+watchPatterns = ["src/**"]
 
 [deploy]
 startCommand = "yarn run start"
