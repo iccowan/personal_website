@@ -42,4 +42,3 @@ jobs:
       railway_token: ${{ secrets.RAILWAY_TOKEN }}
 
     if: ${{ github.event.inputs.environment == 'production' }}
-
