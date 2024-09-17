@@ -9,6 +9,8 @@ on:
     secrets:
       railway_token:
         required: true
+      service_id:
+        required: true
 
 jobs:
   deploy:
@@ -23,6 +25,6 @@ jobs:
         run: curl -fsSL https://railway.app/install.sh | sh
 
       - name: 🚄 push to railway
-        run: railway up
+        run: railway up --service ${{ secrets.service_id }}
         env:
           RAILWAY_TOKEN: ${{ secrets.railway_token }}
