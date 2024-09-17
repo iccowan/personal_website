@@ -9,9 +9,9 @@ export interface Cert {
 
 export const myCerts: Cert[] = [
   {
-    name: '🧑‍✈️  Commercial Pilot',
-    ratings: ['ASEL', 'AMEL', 'Instrument Airplane'],
-    initialDate: 'February 6, 2023',
+    name: '🧑‍✈️  Airline Transport Pilot',
+    ratings: ['AMEL', 'ERJ-170/190', 'Commercial ASEL'],
+    initialDate: 'Feburary 12, 2024',
   },
   {
     name: '👨‍🏫 Flight Instructor',
