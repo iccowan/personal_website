@@ -209,7 +209,7 @@
   <div id="terminal-container" class="m-4">
     <div class="terminal-header">
       <span class="text-accent-focus">
-        <p>foobart 🤖 Interactive Terminal Version 0.0.1</p>
+        <p>foobart 🤖 Interactive Terminal Version 0.0.2</p>
         <p>Kernel 🌽 Version 6.1-rc2</p>
         <div>
           <a href="https://www.linkedin.com/in/ian-cowan" target="_none">
