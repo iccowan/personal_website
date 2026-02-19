@@ -46,7 +46,7 @@
     {/each}
   </article>
   <article class="prose">
-    <h1 class="hidden xl:block">&nbsp;</h1>
+    <h1 class="hidden xl:block">Empty</h1>
     <h2 id="tech">📠 Technologies</h2>
     {#each myTechnologies as tech}
       <div class="text-center w-40 h-40 float-left mr-10">
@@ -58,7 +58,7 @@
         <p>{tech.name}</p>
       </div>
     {/each}
-    <div class="clear-left" />
+    <div class="clear-left"></div>
     <h2 id="certs">✈️ Pilot Certificates</h2>
     {#each myCerts as cert}
       <div>
