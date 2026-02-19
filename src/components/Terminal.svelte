@@ -1,6 +1,6 @@
-<script type="ts">
+<script lang="ts">
   import { afterUpdate, onMount } from 'svelte';
-  import type { TerminalLine } from '../models/TerminalLine';
+  import type { TerminalLine } from '../models/TerminalLine.ts';
   import { aTerminalLine } from '../models/TerminalLine';
   import Fa from 'svelte-fa';
   import { faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons';

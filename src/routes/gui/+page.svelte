@@ -1,4 +1,4 @@
-<script type="ts">
+<script lang="ts">
   import { setTitle } from '../../stores/title';
 
   import { onMount } from 'svelte';
