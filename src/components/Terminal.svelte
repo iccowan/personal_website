@@ -266,7 +266,7 @@
           id="caret"
           style="--caret-offset: {caretOffset}"
           class="bg-accent-focus w-2.5 opacity-80 relative whitespace-pre-wrap text-accent-content"
-        />
+        ></span>
       </div>
     {/if}
   </div>
