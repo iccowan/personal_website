@@ -1,4 +1,5 @@
-<script type="ts">
+<script lang="ts">
+  import '../styles/app.scss'
   import { title } from '../stores/title';
   import { CLI_PAGE, GUI_PAGE, page } from '../stores/page';
 </script>

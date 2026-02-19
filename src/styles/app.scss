@@ -1,10 +1,10 @@
+@use './fonts.scss';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import './fonts';
-
-:global(body) {
+body {
   font-family: 'Fira Code', sans-serif;
 }
 
