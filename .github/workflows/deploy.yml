@@ -1,4 +1,4 @@
-name: deploy
+name: ⚙️ deploy
 
 on:
   workflow_dispatch:
@@ -7,41 +7,29 @@ on:
         type: choice
         required: true
         options:
-          - qa
-          - staging
-          - production
+          - sandbox
+          - prod
 
   push:
     branches:
       - main
 
 jobs:
-  qa:
-    uses: iccowan/personal_website/.github/workflows/deploy-to-railway.yml@main
+  sandbox:
+    uses: iccowan/personal_website/.github/workflows/deploy-to-s3.yml@main
     with:
-      environment: 'qa'
+      environment: 'sandbox'
     secrets:
-      railway_token: ${{ secrets.railway_token }}
-      service_id: ${{ secrets.service_id }}
+      AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
 
-    if: ${{ github.event.inputs.environment == 'qa' }}
+    if: ${{ github.event.inputs.environment == 'sandbox' }}
 
   staging:
-    uses: iccowan/personal_website/.github/workflows/deploy-to-railway.yml@main
+    uses: iccowan/personal_website/.github/workflows/deploy-to-s3.yml@main
     with:
-      environment: 'staging'
+      environment: 'prod'
     secrets:
-      railway_token: ${{ secrets.railway_token }}
-      service_id: ${{ secrets.service_id }}
+      AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
 
-    if: ${{ github.event.inputs.environment == 'staging' || (github.ref == 'refs/heads/main' && github.event_name != 'workflow_dispatch') }}
+    if: ${{ github.event.inputs.environment == 'prod' || (github.ref == 'refs/heads/main' && github.event_name != 'workflow_dispatch') }}
 
-  production:
-    uses: iccowan/personal_website/.github/workflows/deploy-to-railway.yml@main
-    with:
-      environment: 'production'
-    secrets:
-      railway_token: ${{ secrets.RAILWAY_TOKEN }}
-      service_id: ${{ secrets.service_id }}
-
-    if: ${{ github.event.inputs.environment == 'production' }}
