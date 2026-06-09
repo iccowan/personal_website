@@ -1,0 +1,62 @@
+name: 📜 terraform plan
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+    secrets:
+      TF_ROLE_ARN:
+        required: true
+      TF_BACKEND_ROLE_ARN:
+        required: true
+
+permissions:
+  id-token: write
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      TF_VAR_ENV: ${{ vars.TF_VAR_ENV || '' }}
+
+    steps:
+      - name: 🗃️ checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔐 configure aws credentials
+        uses: ./.github/actions/setup-tf-aws-credentials-action
+        with:
+          TF_ROLE_ARN: ${{ secrets.TF_ROLE_ARN }}
+          TF_BACKEND_ROLE_ARN: ${{ secrets.TF_BACKEND_ROLE_ARN }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+
+      - name: 🔧 setup terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.11.3
+
+      - name: 🟢 terraform init
+        run: |
+          cd terraform
+          terraform init
+
+      - name: ✏️ terraform check format
+        run: |
+          cd terraform
+          terraform fmt -recursive -check
+
+      - name: ⚙️ terraform plan
+        run: |
+          cd terraform
+          terraform workspace select ${{ inputs.environment }}
+          terraform plan | tee terraform_plan_output.txt
+
+      - name: 🖋️ add plan to summary
+        uses: sgametrio/terraform-summary-action@main
+        with:
+          log-file: terraform/terraform_plan_output.txt
+          title: ${{ inputs.environment }} terraform plan
+
