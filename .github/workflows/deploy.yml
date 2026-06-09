@@ -24,7 +24,7 @@ jobs:
 
     if: ${{ github.event.inputs.environment == 'sandbox' }}
 
-  staging:
+  prod:
     uses: iccowan/personal_website/.github/workflows/deploy-to-s3.yml@main
     with:
       environment: 'prod'
